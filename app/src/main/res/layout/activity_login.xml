@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+
+        <variable
+            name="loginViewModel"
+            type="com.zll.mvvm.viewmodel.LoginViewModel" />
+
+        <variable
+            name="loginRequest"
+            type="google.architecture.coremodel.http.request.LoginRequest" />
+
+    </data>
+    <!--布局-->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/tv_login"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:onClick="@{(view)->loginViewModel.login(loginRequest)}"
+            android:padding="20px"
+            android:text="@={loginRequest.userName}" />
+
+        <TextView
+            android:id="@+id/tv_login_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="50dp"
+            android:padding="20px"
+            android:text="@{String.valueOf(loginViewModel.isCheck)}" />
+
+    </RelativeLayout>
+
+</layout>
