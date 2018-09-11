@@ -1,19 +1,23 @@
-package com.zll.mvvm.view;
+package com.zll.mvvm.view.login;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.view.View;
 
 import com.apkfuns.logutils.LogUtils;
+import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.zll.mvvm.R;
+import com.zll.mvvm.constant.LoginDataEnum;
 import com.zll.mvvm.databinding.ActivityLoginBinding;
-import com.zll.mvvm.viewmodel.LoginViewModel;
+import com.zll.mvvm.viewmodel.login.LoginViewModel;
+
+import java.util.Arrays;
 
 import google.architecture.common.base.BaseActivity;
 import google.architecture.coremodel.datamodel.http.entities.GirlsData;
-import google.architecture.coremodel.http.request.LoginRequest;
 
 /**
  * @author zhanglianglin
@@ -22,7 +26,8 @@ import google.architecture.coremodel.http.request.LoginRequest;
  * @since 2018/09/03
  */
 
-public class LoginActivity extends BaseActivity<LoginViewModel> {
+public class LoginActivity extends BaseActivity<LoginViewModel>
+        implements BaseQuickAdapter.OnItemChildClickListener {
 
     private ActivityLoginBinding loginBinding;
 
@@ -33,8 +38,10 @@ public class LoginActivity extends BaseActivity<LoginViewModel> {
         loginBinding = DataBindingUtil.setContentView(this, R.layout.activity_login);
         setViewModel(ViewModelProviders.of(LoginActivity.this).get(LoginViewModel.class));
         loginBinding.setLoginViewModel(getViewModel());
-        loginBinding.setLoginRequest(new LoginRequest("登录"));
-        subscribeToModel(getViewModel());
+
+        LoginDataAdapter loginDataAdapter = new LoginDataAdapter(Arrays.asList(LoginDataEnum.values()));
+        loginDataAdapter.setOnItemChildClickListener(this);
+        loginBinding.recyclerView.setAdapter(loginDataAdapter);
     }
 
     /**
@@ -54,4 +61,14 @@ public class LoginActivity extends BaseActivity<LoginViewModel> {
         });
     }
 
+    @Override
+    public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
+        switch (view.getId()) {
+            case R.id.tv_name:
+                loginBinding.getLoginViewModel().gotoPage((LoginDataEnum) adapter.getData().get(position));
+                break;
+            default:
+                break;
+        }
+    }
 }

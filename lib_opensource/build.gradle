@@ -73,6 +73,12 @@ dependencies {
     api deps.arouter.runtime
     //logutils
     api deps.logutils
+    //mqtt
+    api deps.mqtt.service
+    api deps.mqtt.mqttv
+    api group:'commons-codec', name: 'commons-codec', version: '1.8'
+    //适配器
+    api deps.adapter_helper
 
 }
 

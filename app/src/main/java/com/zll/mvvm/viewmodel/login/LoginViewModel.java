@@ -1,10 +1,14 @@
-package com.zll.mvvm.viewmodel;
+package com.zll.mvvm.viewmodel.login;
 
 import android.app.Application;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.databinding.ObservableBoolean;
 import android.support.annotation.NonNull;
+
+import com.alibaba.android.arouter.launcher.ARouter;
+import com.zll.mvvm.constant.LoginDataEnum;
+import com.zll.mvvm.constant.RoutePathConstant;
 
 import google.architecture.common.base.BaseViewModel;
 import google.architecture.coremodel.datamodel.http.entities.GirlsData;
@@ -54,6 +58,7 @@ public class LoginViewModel extends BaseViewModel {
      */
     public void login(LoginRequest loginRequest) {
         isCheck.set(true);
+
         addHttpListener(CommonHttp.getGirlsDatas(getApplication(), getLoadingDialog(false),
                 "20", "1", new CallbackSuccess<Response<GirlsData>>() {
                     @Override
@@ -63,5 +68,20 @@ public class LoginViewModel extends BaseViewModel {
                         }
                     }
                 }));
+    }
+
+    /**
+     * 根据点击{@link com.zll.mvvm.view.login.LoginDataAdapter}item跳转对应页面
+     *
+     * @param loginDataEnum
+     */
+    public void gotoPage(LoginDataEnum loginDataEnum) {
+        switch (loginDataEnum) {
+            case MQTT:
+                ARouter.getInstance().build(RoutePathConstant.TEST_MQTT).navigation();
+                break;
+            default:
+                break;
+        }
     }
 }

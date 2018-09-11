@@ -12,12 +12,6 @@ android {
         versionName build_versions.version_name
 
 //        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        //ARouter
-        javaCompileOptions {
-            annotationProcessorOptions {
-                arguments = [moduleName: project.getName()]
-            }
-        }
     }
 
     buildTypes {
@@ -43,7 +37,6 @@ dependencies {
 
     api project(':lib_opensource')
 
-    annotationProcessor deps.arouter.compiler
 }
 
 //uploadArchives {
