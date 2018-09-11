@@ -11,7 +11,15 @@ android {
         versionCode build_versions.version_code
         versionName build_versions.version_name
 
-//        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        //room 输出模式:在编译时，将数据库的模式信息导出到JSON文件中，这样可有利于我们更好的调试和排错
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = ["room.schemaLocation":
+                                     "$projectDir/schemas".toString()]
+            }
+        }
     }
 
     buildTypes {
@@ -36,6 +44,8 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
 
     api project(':lib_opensource')
+    //使用到room的Moudel必须加上这个
+    annotationProcessor deps.room.compiler
 
 }
 

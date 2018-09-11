@@ -48,6 +48,8 @@ dependencies {
     api deps.lifecycle.extensions
     annotationProcessor deps.lifecycle.compiler
     api deps.room.runtime
+    //room添加这个才会使用有Flowable
+    api deps.room.rxjava2
     annotationProcessor deps.room.compiler
 
     //fresco
