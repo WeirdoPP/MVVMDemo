@@ -1,7 +1,11 @@
 package com.zll.mvvm;
 
+import android.content.Intent;
+
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.facebook.drawee.backends.pipeline.Fresco;
+import com.xdandroid.hellodaemon.DaemonEnv;
+import com.zll.mvvm.mqtt.MQTTService;
 
 import google.architecture.common.base.BaseApplication;
 import google.architecture.common.util.Utils;
@@ -27,5 +31,8 @@ public class App extends BaseApplication {
         ARouter.init(this);
         //room初始化
         RoomManager.initRoom(this);
+        //守护进程初始化,启动服务
+        DaemonEnv.initialize(this, MQTTService.class, null);
+        startService(new Intent(this, MQTTService.class));
     }
 }

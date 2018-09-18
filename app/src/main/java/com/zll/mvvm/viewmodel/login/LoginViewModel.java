@@ -6,9 +6,7 @@ import android.arch.lifecycle.MutableLiveData;
 import android.databinding.ObservableBoolean;
 import android.support.annotation.NonNull;
 
-import com.alibaba.android.arouter.launcher.ARouter;
 import com.zll.mvvm.constant.LoginDataEnum;
-import com.zll.mvvm.constant.RoutePathConstant;
 
 import google.architecture.common.base.BaseViewModel;
 import google.architecture.coremodel.datamodel.http.entities.GirlsData;
@@ -77,9 +75,6 @@ public class LoginViewModel extends BaseViewModel {
      */
     public void gotoPage(LoginDataEnum loginDataEnum) {
         switch (loginDataEnum) {
-            case MQTT:
-                ARouter.getInstance().build(RoutePathConstant.TEST_MQTT).navigation();
-                break;
             default:
                 break;
         }

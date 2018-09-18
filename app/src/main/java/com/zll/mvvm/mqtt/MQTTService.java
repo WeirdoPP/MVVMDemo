@@ -4,13 +4,14 @@ package com.zll.mvvm.mqtt;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
+import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 
 import com.apkfuns.logutils.LogUtils;
+import com.xdandroid.hellodaemon.AbsWorkService;
 import com.zll.mvvm.R;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
@@ -32,8 +33,13 @@ import static org.eclipse.paho.client.mqttv3.MqttConnectOptions.MQTT_VERSION_3_1
  * @version 1.0
  * @desc mqtt服务
  * @since 2018/09/08
+ * <p>
+ * 服务既可以是启动服务，也允许绑定。此时需要同时实现以下回调方法：(startService)onStartCommand()和 (bindService)onBind()。系统不会在所有客户端都取消绑定时销毁服务。为此，必须通过调用 stopSelf() 或 stopService() 显式停止服务
+ * 通过添加 android:exported 属性并将其设置为 "false"，确保服务仅适用于本应用
+ * <p>
+ * https://www.jianshu.com/p/95ec2a23f300
  */
-public class MQTTService extends Service {
+public class MQTTService extends AbsWorkService {
 
     private static MqttAndroidClient sampleClient;
 
@@ -58,60 +64,10 @@ public class MQTTService extends Service {
         }
     }
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        LogUtils.d("onCreate");
-        init();
-    }
-
     /**
      * 初始化
      */
     private void init() {
-//        // 服务器地址（协议+地址+端口号）
-//        client = new MqttAndroidClient(this, MQTTConstant.BROKER, MQTTConstant.CLIENT_ID);
-//        // 设置MQTT监听并且接受消息
-//        client.setCallback(mqttCallback);
-//
-//        conOpt = new MqttConnectOptions();
-//        // 清除缓存
-//        conOpt.setCleanSession(true);
-//        // 设置超时时间，单位：秒
-//        conOpt.setConnectionTimeout(10);
-//        // 心跳包发送间隔，单位：秒
-//        conOpt.setKeepAliveInterval(20);
-//        // 用户名
-//        conOpt.setUserName(MQTTConstant.ACESSKEY);
-//        // 密码
-//        conOpt.setPassword(MQTTConstant.PASSWORD.toCharArray());     //将字符串转换为字符串数组
-//
-//        // last will message
-//        boolean doConnect = true;
-//        String message = "{\"terminal_uid\":\"" + MQTTConstant.CLIENT_ID + "\"}";
-//        LogUtils.d("message是: %s", message);
-//        String TOPIC = MQTTConstant.TOPIC;
-//        Integer qos = 0;
-//        Boolean retained = false;
-//        if ((!message.equals("")) || (!TOPIC.equals(""))) {
-//            // 最后的遗嘱
-//            // MQTT本身就是为信号不稳定的网络设计的，所以难免一些客户端会无故的和Broker断开连接。
-//            //当客户端连接到Broker时，可以指定LWT，Broker会定期检测客户端是否有异常。
-//            //当客户端异常掉线时，Broker就往连接时指定的topic里推送当时指定的LWT消息。
-//
-//            try {
-//                conOpt.setWill(TOPIC, message.getBytes(), qos.intValue(), retained.booleanValue());
-//            } catch (Exception e) {
-//                LogUtils.d("Exception Occured %s", e);
-//                doConnect = false;
-//                iMqttActionListener.onFailure(null, e);
-//            }
-//        }
-//
-//        if (doConnect) {
-//            doClientConnection();
-//        }
-
         String sign;
         MemoryPersistence persistence = new MemoryPersistence();
         try {
@@ -156,9 +112,7 @@ public class MQTTService extends Service {
 
                 public void messageArrived(String topic, MqttMessage mqttMessage) throws Exception {
                     LogUtils.d("messageArrived:" + topic + "------" + new String(mqttMessage.getPayload()));
-                    if (IGetMessageCallBack != null) {
-                        IGetMessageCallBack.setMessage(new String(mqttMessage.getPayload()));
-                    }
+
                 }
 
                 public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {
@@ -188,100 +142,104 @@ public class MQTTService extends Service {
     }
 
     /**
-     * 连接MQTT服务器
+     * 在服务第一次创建的时候调用
      */
-//    private void doClientConnection(MqttConnectOptions connOpts) {
-//        if (!sampleClient.isConnected() && isConnectIsNormal()) {
-//            try {
-//                sampleClient.connect(connOpts, null, iMqttActionListener);
-//            } catch (MqttException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//
-//    }
-
-    /**
-     * MQTT是否连接成功回调
-     */
-//    private IMqttActionListener iMqttActionListener = new IMqttActionListener() {
-//
-//        @Override
-//        public void onSuccess(IMqttToken arg0) {
-//            LogUtils.d("连接成功 ");
-//            try {
-//                // 订阅myTopic话题
-//                sampleClient.subscribe(MQTTConstant.TOPIC, 1);
-//            } catch (MqttException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//
-//        @Override
-//        public void onFailure(IMqttToken arg0, Throwable arg1) {
-//            arg1.printStackTrace();
-//            // 连接失败，重连
-//        }
-//    };
-
-    /**
-     * MQTT监听并且接受消息回调
-     */
-//    private MqttCallback mqttCallback = new MqttCallback() {
-//
-//        @Override
-//        public void messageArrived(String TOPIC, MqttMessage message) throws Exception {
-//
-//            String str1 = new String(message.getPayload());
-//            if (IGetMessageCallBack != null) {
-//                IGetMessageCallBack.setMessage(str1);
-//            }
-//            String str2 = TOPIC + ";qos:" + message.getQos() + ";retained:" + message.isRetained();
-//            LogUtils.d("messageArrived:%s", str1);
-//            LogUtils.d(str2);
-//        }
-//
-//        @Override
-//        public void deliveryComplete(IMqttDeliveryToken arg0) {
-//
-//        }
-//
-//        @Override
-//        public void connectionLost(Throwable arg0) {
-//            // 失去连接，重连
-//        }
-//    };
     @Override
-    public void onDestroy() {
-        stopSelf();
+    public void onCreate() {
+        super.onCreate();
+        LogUtils.d("onCreate");
+
+    }
+
+    /**
+     * 是否 任务完成, 不再需要服务运行?
+     *
+     * @return 应当停止服务, true; 应当启动服务, false; 无法判断, null.
+     */
+    @Override
+    public Boolean shouldStopService(Intent intent, int flags, int startId) {
+        return false;
+    }
+
+    @Override
+    public void startWork(Intent intent, int flags, int startId) {
+        init();
+    }
+
+    @Override
+    public void stopWork(Intent intent, int flags, int startId) {
+        stopSelf(startId);
         try {
             sampleClient.disconnect();
         } catch (MqttException e) {
             e.printStackTrace();
         }
-        super.onDestroy();
     }
 
     /**
-     * 判断网络是否连接
+     * 任务是否正在运行?
+     *
+     * @return 任务正在运行, true; 任务当前不在运行, false; 无法判断, null.
      */
-//    private boolean isConnectIsNormal() {
-//        ConnectivityManager connectivityManager = (ConnectivityManager) this.getApplicationContext()
-//                .getSystemService(Context.CONNECTIVITY_SERVICE);
-//        NetworkInfo info = connectivityManager.getActiveNetworkInfo();
-//        if (info != null && info.isAvailable()) {
-//            String name = info.getTypeName();
-//            LogUtils.d("MQTT当前网络名称：%s", name);
-//            return true;
-//        } else {
-//            LogUtils.d("MQTT 没有可用网络");
-//            return false;
-//        }
-//    }
     @Override
-    public IBinder onBind(Intent intent) {
+    public Boolean isWorkRunning(Intent intent, int flags, int startId) {
+        return sampleClient != null && sampleClient.isConnected();
+    }
+
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent, Void alwaysNull) {
         LogUtils.d("onBind");
-        return new CustomBinder();
+        return null;
+    }
+
+    /**
+     * 服务被杀时调用, 可以在这里面保存数据.
+     *
+     * @param rootIntent
+     */
+    @Override
+    public void onServiceKilled(Intent rootIntent) {
+
+    }
+
+    /**
+     * 每次服务启动的时候调用,我们如果一旦服务启动就需要去执行某些操作，逻辑就可以写在 onStartCommand() 方法中
+     * <p>
+     * 每次回调onStartCommand()方法时，参数“startId”的值都是递增的，startId用于唯一标识每次对Service发起的处理请求
+     * 如果服务同时处理多个 onStartCommand() 请求，则不应在处理完一个启动请求之后立即销毁服务，
+     * 因为此时可能已经收到了新的启动请求，在第一个请求结束时停止服务会导致第二个请求被终止。
+     * 为了避免这一问题，可以使用 stopSelf(int) 确保服务停止请求始终基于最新一次的启动请求。
+     * 也就是说，如果调用 stopSelf(int) 方法的参数值与onStartCommand()接受到的最新的startId值不相符的话，
+     * stopSelf()方法就会失效，从而避免终止尚未处理的请求
+     * <p>
+     * onStartCommand() 方法必须返回一个整数，用于描述系统应该如何应对服务被杀死的情况，返回值必须是以下常量之一：
+     * START_NOT_STICKY
+     * 如果系统在 onStartCommand() 返回后终止服务，则除非有挂起 Intent 要传递，否则系统不会重建服务。这是最安全的选项，可以避免在不必要时以及应用能够轻松重启所有未完成的作业时运行服务
+     * START_STICKY
+     * 如果系统在 onStartCommand() 返回后终止服务，则会重建服务并调用 onStartCommand()，但不会重新传递最后一个 Intent。相反，除非有挂起 Intent 要启动服务（在这种情况下，将传递这些 Intent ），否则系统会通过空 Intent 调用 onStartCommand()。这适用于不执行命令、但无限期运行并等待作业的媒体播放器（或类似服务）
+     * START_REDELIVER_INTENT
+     * 如果系统在 onStartCommand() 返回后终止服务，则会重建服务，并通过传递给服务的最后一个 Intent 调用 onStartCommand()。任何挂起 Intent 均依次传递。这适用于主动执行应该立即恢复的作业（例如下载文件）的服务
+     *
+     * @param intent
+     * @param flags
+     * @param startId
+     * @return
+     */
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        LogUtils.d("onStartCommand");
+        return super.onStartCommand(intent, flags, startId);
+    }
+
+    /**
+     * 销毁服务时调用
+     * 在这里可以回收不在使用的资源
+     */
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        LogUtils.d("onDestroy");
     }
 
     /**

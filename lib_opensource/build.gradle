@@ -81,6 +81,8 @@ dependencies {
     api group:'commons-codec', name: 'commons-codec', version: '1.8'
     //适配器
     api deps.adapter_helper
+    //进程保活
+    api deps.daemon
 
 }
 

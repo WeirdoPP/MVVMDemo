@@ -9,7 +9,7 @@ package com.zll.mvvm.constant;
 
 public enum LoginDataEnum {
 
-    MQTT("MQTT"),;
+    ;
 
     private String type;
 

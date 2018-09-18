@@ -15,17 +15,22 @@ public class MQTTConstant {
 //    aliware.mqtt.consumerId=CID_Lizikj_MqttMsgConsumerGroup_dev
 //    aliware.mqtt.TOPIC=LIZIKJ_MQTT_MSG_DEV
 
-
-    //设置当前用户私有的MQTT的接入点。例如此处示意使用XXX，实际使用请替换用户自己的接入点。接入点的获取方法是，在控制台申请MQTT实例，每个实例都会分配一个接入点域名。
-    public static final String BROKER = "tcp://post-cn-v0h0rwihv01.mqtt.aliyuncs.com:1883";
-    //要订阅的主题
-    public static final String TOPIC = "LIZIKJ_MQTT_MSG_DEV";
+    /**
+     * 设置当前用户私有的MQTT的接入点。例如此处示意使用XXX，
+     * 实际使用请替换用户自己的接入点。接入点的获取方法是，
+     * 在控制台申请MQTT实例，每个实例都会分配一个接入点域名 服务器地址（协议+地址+端口号）
+     */
+    public static final String BROKER = "tcp://post-cn-0pp0rwiln04.mqtt.aliyuncs.com:1883";
+    /**
+     * 要订阅的主题
+     */
+    public static final String TOPIC = "LIZIKJ_MQTT_MSG_TEST";
     /**
      * MQTT的ClientID，一般由两部分组成，GroupID@@@DeviceID
      * 其中GroupID在MQ控制台里申请
      * DeviceID由应用方设置，可能是设备编号等，需要唯一，否则服务端拒绝重复的ClientID连接
      */
-    public static final String CLIENT_ID = "GID_Lizikj_MqttMsgGroup_dev@@@androidIds";//客户端标识
+    public static final String CLIENT_ID = "GID_LIZIKJ_MQTT_MSG_GROUP_TEST@@@androidTest";//客户端标识
     /**
      * 设置阿里云的AccessKey，用于鉴权
      */
@@ -37,7 +42,7 @@ public class MQTTConstant {
     /**
      * GroupID在MQ控制台里申请
      */
-    public static final String GROUPID = "GID_Lizikj_MqttMsgGroup_dev";
+    public static final String GROUPID = "GID_LIZIKJ_MQTT_MSG_GROUP_TEST";
 
 
 }
