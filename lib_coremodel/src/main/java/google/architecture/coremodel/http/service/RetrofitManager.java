@@ -1,11 +1,12 @@
 package google.architecture.coremodel.http.service;
 
 
+import android.content.Context;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import google.architecture.coremodel.http.service.core.interceptor.ResponseInterceptor;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import okhttp3.OkHttpClient;
@@ -29,11 +30,12 @@ public class RetrofitManager {
     public static final int CONNECT_TIMEOUT = 30;
     public static final int WRITE_TIMEOUT = 60;
     public static final int READ_TIMEOUT = 60;
+    private static final long CACHE_SIZE = 1024 * 1024 * 50;
 
     private static Map<String, CompositeDisposable> netManager = new HashMap<>();
 
-    public static Retrofit getInstance() {
-        return Instance.getRetrofit();
+    public static Retrofit getInstance(Context context) {
+        return Instance.getRetrofit(context);
     }
 
     /**
@@ -59,7 +61,7 @@ public class RetrofitManager {
     private static class Instance {
         private static String baseUrl = GANK_HOST;
 
-        private static Retrofit getRetrofit() {
+        private static Retrofit getRetrofit(Context context) {
             OkHttpClient.Builder httpBuilder = new OkHttpClient.Builder();
             // debug模式添加log信息拦截
 //            if (BaseApplication.getInstance().isDebug()) {
@@ -68,11 +70,17 @@ public class RetrofitManager {
 
 //            httpBuilder.addInterceptor(new HeaderInterceptor()); // 请求头统一封装拦截
 //            httpBuilder.addInterceptor(new ParamsInterceptor()); // 请求参数统一加密处理
-            httpBuilder.addInterceptor(new ResponseInterceptor()); // 响应结果统一处理
+//            httpBuilder.addInterceptor(new ResponseInterceptor()); // 响应结果统一处理
 
             HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor();//打印返回级别
             httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
             httpBuilder.addInterceptor(httpLoggingInterceptor);
+
+            //设置网络缓存目录以及添加缓存拦截器
+//            File cacheFile = new File(context.getCacheDir(), "mvvm_demo");
+//            Cache cache = new Cache(cacheFile, CACHE_SIZE);
+//            httpBuilder.cache(cache);
+//            httpBuilder.addNetworkInterceptor(new CacheInterceptor(context));
 
             // 设置重试
             httpBuilder.retryOnConnectionFailure(true);

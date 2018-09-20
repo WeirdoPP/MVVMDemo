@@ -10,7 +10,6 @@ import com.zll.mvvm.constant.LoginDataEnum;
 
 import google.architecture.common.base.BaseViewModel;
 import google.architecture.coremodel.datamodel.http.entities.GirlsData;
-import google.architecture.coremodel.http.request.LoginRequest;
 import google.architecture.coremodel.http.result.base.Response;
 import google.architecture.coremodel.http.service.CommonHttp;
 import google.architecture.coremodel.http.service.core.CallbackSuccess;
@@ -54,9 +53,7 @@ public class LoginViewModel extends BaseViewModel {
     /**
      * 登录
      */
-    public void login(LoginRequest loginRequest) {
-        isCheck.set(true);
-
+    public void login() {
         addHttpListener(CommonHttp.getGirlsDatas(getApplication(), getLoadingDialog(false),
                 "20", "1", new CallbackSuccess<Response<GirlsData>>() {
                     @Override
@@ -75,6 +72,9 @@ public class LoginViewModel extends BaseViewModel {
      */
     public void gotoPage(LoginDataEnum loginDataEnum) {
         switch (loginDataEnum) {
+            case TEST_NET_CACHE:
+                login();
+                break;
             default:
                 break;
         }

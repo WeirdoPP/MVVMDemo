@@ -9,7 +9,7 @@ package com.zll.mvvm.constant;
 
 public enum LoginDataEnum {
 
-    ;
+    TEST_NET_CACHE("测试网络缓存");
 
     private String type;
 

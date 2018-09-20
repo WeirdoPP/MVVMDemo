@@ -66,6 +66,8 @@ dependencies {
     api deps.retrofit.adapter_rxjava2
     api deps.okhttp.okhttp3
     api deps.okhttp.okhttp3_logging_interceptor
+    api deps.rxcache
+    api deps.jolyglot
 
     // RxJava
 //    implementation deps.rxjava2
@@ -83,6 +85,10 @@ dependencies {
     api deps.adapter_helper
     //进程保活
     api deps.daemon
+    //常用工具类
+    api deps.utilcode
+    //权限
+    api deps.andPermission
 
 }
 

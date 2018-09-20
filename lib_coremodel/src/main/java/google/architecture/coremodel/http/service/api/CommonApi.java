@@ -3,7 +3,7 @@ package google.architecture.coremodel.http.service.api;
 import google.architecture.coremodel.datamodel.http.entities.GirlsData;
 import google.architecture.coremodel.http.result.base.Response;
 import google.architecture.coremodel.http.service.config.APIUrl;
-import io.reactivex.Flowable;
+import io.reactivex.Observable;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
 
@@ -16,6 +16,16 @@ import retrofit2.http.Path;
 
 public interface CommonApi {
 
+    /**
+     * max-age 的值单位是秒
+     *
+     * @param size
+     * @param index
+     * @return
+     */
+//    @Headers({CacheInterceptor.HEADER_DYNAMIC_CONDITION_GET
+//            , "Cache-Control: max-age=10"
+//    })
     @GET(APIUrl.GET_GIRLS_DATAS)
-    Flowable<Response<GirlsData>> getGirlsDatas(@Path("size") String size, @Path("index") String index);
+    Observable<Response<GirlsData>> getGirlsDatas(@Path("size") String size, @Path("index") String index);
 }

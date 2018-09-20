@@ -11,7 +11,7 @@ import java.net.UnknownHostException;
 import google.architecture.coremodel.http.result.base.Response;
 import google.architecture.coremodel.http.service.config.APIConstant;
 import google.architecture.coremodel.http.service.core.CallBack;
-import io.reactivex.subscribers.DisposableSubscriber;
+import io.reactivex.observers.DisposableObserver;
 
 /**
  * 预处理请求结果类
@@ -21,7 +21,7 @@ import io.reactivex.subscribers.DisposableSubscriber;
  * @since 2017/6/14 0014
  */
 
-public class BaseSubscriber<T> extends DisposableSubscriber<Response<T>> {
+public class BaseSubscriber<T> extends DisposableObserver<Response<T>> {
 
     private CallBack<Response<T>> callBack;
 

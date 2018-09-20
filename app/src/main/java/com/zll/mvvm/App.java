@@ -4,6 +4,7 @@ import android.content.Intent;
 
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.facebook.drawee.backends.pipeline.Fresco;
+import com.mvvm.opensoure.AppRootFileUtils;
 import com.xdandroid.hellodaemon.DaemonEnv;
 import com.zll.mvvm.mqtt.MQTTService;
 
@@ -28,11 +29,18 @@ public class App extends BaseApplication {
             ARouter.openDebug();
             ARouter.openLog();
         }
+        //路由初始化
         ARouter.init(this);
         //room初始化
         RoomManager.initRoom(this);
+        //常用工具类初始化
+        Utils.init(this);
+        //APP 文件目录初始化
+        AppRootFileUtils.onCreate(getApplicationContext());
         //守护进程初始化,启动服务
         DaemonEnv.initialize(this, MQTTService.class, null);
         startService(new Intent(this, MQTTService.class));
+
     }
+
 }

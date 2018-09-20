@@ -9,7 +9,7 @@ import google.architecture.coremodel.http.service.core.CallBack;
 import google.architecture.coremodel.http.service.core.subscriber.BaseSubscriber;
 import google.architecture.coremodel.http.service.core.subscriber.ProgressSubscriber;
 import google.architecture.coremodel.http.service.core.subscriber.RxSchedulers;
-import io.reactivex.Flowable;
+import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
 
 /**
@@ -23,17 +23,18 @@ public class BaseHttp {
     /**
      * 无加载中对话框的订阅方法
      */
-    protected static <T> Disposable subscribe(@NonNull Context context, Flowable<Response<T>> flowable, CallBack<Response<T>> callBack) {
-        return flowable.compose(RxSchedulers.<Response<T>>mainThread(context, callBack))
+    protected static <T> Disposable subscribe(@NonNull Context context, Observable<Response<T>> observable, CallBack<Response<T>> callBack) {
+        return observable.compose(RxSchedulers.<Response<T>>mainThread(context, callBack))
                 .subscribeWith(new BaseSubscriber<>(callBack));
+
     }
 
     /**
      * 带加载中对话框的订阅方法
      */
-    protected static <T> Disposable subscribeWithLoading(@NonNull Context context, LoadingDialog dialog, Flowable<Response<T>> flowable,
+    protected static <T> Disposable subscribeWithLoading(@NonNull Context context, LoadingDialog dialog, Observable<Response<T>> observable,
                                                          CallBack<Response<T>> callBack) {
-        return flowable.compose(RxSchedulers.<Response<T>>mainThread(context, dialog, callBack))
+        return observable.compose(RxSchedulers.<Response<T>>mainThread(context, dialog, callBack))
                 .subscribeWith(new ProgressSubscriber<>(dialog, callBack));
     }
 

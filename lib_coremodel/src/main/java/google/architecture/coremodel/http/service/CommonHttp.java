@@ -7,7 +7,11 @@ import google.architecture.coremodel.http.LoadingDialog;
 import google.architecture.coremodel.http.result.base.Response;
 import google.architecture.coremodel.http.service.api.CommonApi;
 import google.architecture.coremodel.http.service.core.CallBack;
+import google.architecture.coremodel.http.service.providers.CacheProviders;
+import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
+import io.rx_cache2.DynamicKey;
+import io.rx_cache2.EvictDynamicKey;
 
 /**
  * @author zhanglianglin
@@ -18,8 +22,8 @@ import io.reactivex.disposables.Disposable;
 
 public class CommonHttp extends BaseHttp {
 
-    public static CommonApi getOrderMealApi() {
-        return RetrofitManager.getInstance().create(CommonApi.class);
+    public static CommonApi getCommonApi(Context context) {
+        return RetrofitManager.getInstance(context).create(CommonApi.class);
     }
 
     /**
@@ -32,6 +36,11 @@ public class CommonHttp extends BaseHttp {
      * @return
      */
     public static Disposable getGirlsDatas(Context context, LoadingDialog dialog, String size, String index, CallBack<Response<GirlsData>> callBack) {
-        return subscribeWithLoading(context, dialog, getOrderMealApi().getGirlsDatas(size, index), callBack);
+        Observable observable = CacheProviders.getLoginProviders()
+                .getGirlsDatas(CommonHttp.getCommonApi(context).getGirlsDatas(size, index)
+                        , new DynamicKey("getGirlsDatas"), new EvictDynamicKey(false));
+        return subscribeWithLoading(context, dialog, observable, callBack);
     }
+
+
 }

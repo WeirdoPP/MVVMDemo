@@ -4,19 +4,16 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.support.annotation.NonNull;
 
-import org.reactivestreams.Publisher;
-import org.reactivestreams.Subscription;
-
-import java.net.ConnectException;
 import java.util.concurrent.TimeUnit;
 
 import google.architecture.coremodel.http.LoadingDialog;
-import google.architecture.coremodel.http.service.config.APIConstant;
 import google.architecture.coremodel.http.service.core.CallBack;
 import google.architecture.coremodel.util.NetworkUtil;
-import io.reactivex.Flowable;
-import io.reactivex.FlowableTransformer;
+import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
+import io.reactivex.ObservableTransformer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
@@ -34,24 +31,25 @@ public class RxSchedulers {
     /**
      * 基本请求
      */
-    public static <T> FlowableTransformer<T, T> mainThread(final Context context, final CallBack callBack) {
-        return new FlowableTransformer<T, T>() {
+    public static <T> ObservableTransformer<T, T> mainThread(final Context context, final CallBack callBack) {
+
+        return new ObservableTransformer<T, T>() {
+
             @Override
-            public Publisher<T> apply(@NonNull Flowable<T> upstream) {
+            public ObservableSource<T> apply(Observable<T> upstream) {
                 return upstream.subscribeOn(Schedulers.io())
-                        .doOnSubscribe(new Consumer<Subscription>() {
+                        .doOnSubscribe(new Consumer<Disposable>() {
                             @Override
-                            public void accept(@NonNull Subscription subscription) throws Exception {
-                                // 如果无网络，则直接取消
-                                if (!NetworkUtil.isConnected(context)) {
-                                    if (null != callBack) {
-                                        callBack.handleBreak(APIConstant.NET_CODE_NOT_CONNECT,
-                                                APIConstant.CONNECT_EXCEPTION, new ConnectException("网络出错,请重试"));
-                                        callBack.fail(APIConstant.NET_CODE_NOT_CONNECT, APIConstant.CONNECT_EXCEPTION);
-                                        callBack.finish();
-                                    }
-                                    cancel(subscription);
-                                }
+                            public void accept(Disposable disposable) throws Exception {
+//                                if (!NetworkUtil.isConnected(context)) {
+//                                    if (null != callBack) {
+//                                        callBack.handleBreak(APIConstant.NET_CODE_NOT_CONNECT,
+//                                                APIConstant.CONNECT_EXCEPTION, new ConnectException("网络出错,请重试"));
+//                                        callBack.fail(APIConstant.NET_CODE_NOT_CONNECT, APIConstant.CONNECT_EXCEPTION);
+//                                        callBack.finish();
+//                                    }
+//                                    cancel(disposable);
+//                                }
                             }
                         })
                         .observeOn(AndroidSchedulers.mainThread());
@@ -62,31 +60,31 @@ public class RxSchedulers {
     /**
      * 带进度条的请求
      */
-    public static <T> FlowableTransformer<T, T> mainThread(final Context context, final LoadingDialog dialog, final CallBack callBack) {
-        return new FlowableTransformer<T, T>() {
+    public static <T> ObservableTransformer<T, T> mainThread(final Context context, final LoadingDialog dialog, final CallBack callBack) {
+        return new ObservableTransformer<T, T>() {
             @Override
-            public Publisher<T> apply(@NonNull Flowable<T> upstream) {
+            public ObservableSource<T> apply(@NonNull Observable<T> upstream) {
                 return upstream
                         .delay(1, TimeUnit.SECONDS)
                         .subscribeOn(Schedulers.io())
-                        .doOnSubscribe(new Consumer<Subscription>() {
+                        .doOnSubscribe(new Consumer<Disposable>() {
                             @Override
-                            public void accept(@NonNull final Subscription subscription) throws Exception {
-                                if (!NetworkUtil.isConnected(context)) {
-                                    if (null != callBack) {
-                                        callBack.handleBreak(APIConstant.NET_CODE_NOT_CONNECT,
-                                                APIConstant.CONNECT_EXCEPTION, new ConnectException("网络出错,请重试"));
-                                        callBack.fail(APIConstant.NET_CODE_NOT_CONNECT, APIConstant.CONNECT_EXCEPTION);
-                                        callBack.finish();
-                                    }
-                                    cancel(subscription);
+                            public void accept(@NonNull final Disposable disposable) throws Exception {
+                                if (!NetworkUtil.isConnected(context)) {//需要判断是否需要读缓存才能解封注释代码
+//                                    if (null != callBack) {
+//                                        callBack.handleBreak(APIConstant.NET_CODE_NOT_CONNECT,
+//                                                APIConstant.CONNECT_EXCEPTION, new ConnectException("网络出错,请重试"));
+//                                        callBack.fail(APIConstant.NET_CODE_NOT_CONNECT, APIConstant.CONNECT_EXCEPTION);
+//                                        callBack.finish();
+//                                    }
+//                                    cancel(disposable);
                                 } else {
                                     // 启动进度显示，取消进度时会取消请求
                                     if (dialog != null) {
                                         dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
                                             @Override
                                             public void onCancel(DialogInterface dialog) {
-                                                subscription.cancel();
+                                                disposable.dispose();
                                             }
                                         });
                                         dialog.show();
@@ -102,35 +100,35 @@ public class RxSchedulers {
     /**
      * 带进度条的请求
      */
-    public static <T> FlowableTransformer<T, T> mainThread(final Context context, final LoadingDialog dialog,
-                                                           final OnSchedulerCancelListener listener, final CallBack callBack) {
-        return new FlowableTransformer<T, T>() {
+    public static <T> ObservableTransformer<T, T> mainThread(final Context context, final LoadingDialog dialog,
+                                                             final OnSchedulerCancelListener listener, final CallBack callBack) {
+        return new ObservableTransformer<T, T>() {
             @Override
-            public Publisher<T> apply(@NonNull Flowable<T> upstream) {
+            public ObservableSource<T> apply(@NonNull Observable<T> upstream) {
                 return upstream
                         .delay(1, TimeUnit.SECONDS)
                         .subscribeOn(Schedulers.io())
-                        .doOnSubscribe(new Consumer<Subscription>() {
+                        .doOnSubscribe(new Consumer<Disposable>() {
                             @Override
-                            public void accept(@NonNull final Subscription subscription) throws Exception {
+                            public void accept(@NonNull final Disposable disposable) throws Exception {
                                 if (!NetworkUtil.isConnected(context)) {
-                                    if (null != callBack) {
-                                        callBack.handleBreak(APIConstant.NET_CODE_NOT_CONNECT,
-                                                APIConstant.CONNECT_EXCEPTION, new ConnectException("网络出错,请重试"));
-                                        callBack.fail(APIConstant.NET_CODE_NOT_CONNECT, APIConstant.CONNECT_EXCEPTION);
-                                        callBack.finish();
-                                    }
-                                    cancel(subscription);
-                                    if (dialog != null) {
-                                        dialog.dismiss();
-                                    }
+//                                    if (null != callBack) {
+//                                        callBack.handleBreak(APIConstant.NET_CODE_NOT_CONNECT,
+//                                                APIConstant.CONNECT_EXCEPTION, new ConnectException("网络出错,请重试"));
+//                                        callBack.fail(APIConstant.NET_CODE_NOT_CONNECT, APIConstant.CONNECT_EXCEPTION);
+//                                        callBack.finish();
+//                                    }
+//                                    cancel(disposable);
+//                                    if (dialog != null) {
+//                                        dialog.dismiss();
+//                                    }
                                 } else {
                                     // 启动进度显示，取消进度时会取消请求
                                     if (dialog != null) {
                                         dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
                                             @Override
                                             public void onCancel(DialogInterface dialog) {
-                                                subscription.cancel();
+                                                disposable.dispose();
                                                 if (listener != null) {
                                                     listener.onSchedulerCancel();
                                                 }
@@ -145,8 +143,8 @@ public class RxSchedulers {
         };
     }
 
-    private static void cancel(@NonNull Subscription subscription) {
-        subscription.cancel();
+    private static void cancel(@NonNull Disposable disposable) {
+        disposable.dispose();
     }
 
     /**
